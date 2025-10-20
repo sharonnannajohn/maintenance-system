@@ -52,4 +52,22 @@ public class Request {
                " | Created by: " + createdBy.getName() +
                (assignedWorker != null ? " | Assigned to: " + assignedWorker.getName() : " | Not assigned");
     }
+    public void saveToDB() {
+        try (Connection conn = DBConnection.getConnection()) {
+            String sql = "INSERT INTO request (id, description, status, created_by, assigned_worker) VALUES (?, ?, ?, ?, ?)";
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ps.setInt(1, this.id);
+            ps.setString(2, this.description);
+            ps.setString(3, this.status);
+            ps.setInt(4, this.createdBy.getId());
+            if (this.assignedWorker != null)
+                ps.setInt(5, this.assignedWorker.getId());
+            else
+                ps.setNull(5, java.sql.Types.INTEGER);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
 }
