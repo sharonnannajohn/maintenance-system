@@ -1,0 +1,239 @@
+
+import java.util.*;
+
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+
+        List<Admin> admins = new ArrayList<>();
+        List<User> users = new ArrayList<>();
+        List<Worker> workers = new ArrayList<>();
+        List<Request> requests = new ArrayList<>();
+
+        int adminId = 1, userId = 1, workerId = 1, requestId = 1;
+
+        while (true) {
+            System.out.println("\n===== Maintenance Request System =====");
+            System.out.println("1. Register Admin");
+            System.out.println("2. Register User");
+            System.out.println("3. Register Worker");
+            System.out.println("4. User: Create Request");
+            System.out.println("5. Admin: Assign Worker");
+            System.out.println("6. Worker: Update Request Status");
+            System.out.println("7. Admin: Filter Requests by Status");
+            System.out.println("8. Show All Requests");
+            System.out.println("0. Exit");
+            System.out.print("Enter choice: ");
+
+            int choice = sc.nextInt();
+            sc.nextLine();
+
+            switch (choice) {
+                case 1: // Register Admin
+                    System.out.print("Enter name: ");
+                    String an = sc.nextLine();
+                    System.out.print("Enter email: ");
+                    String ae = sc.nextLine();
+                    System.out.print("Enter password: ");
+                    String ap = sc.nextLine();
+                    admins.add(new Admin(adminId++, an, ae, ap));
+                    System.out.println("Admin registered.");
+                    break;
+
+                case 2: // Register User
+                    System.out.print("Enter name: ");
+                    String un = sc.nextLine();
+                    System.out.print("Enter email: ");
+                    String ue = sc.nextLine();
+                    System.out.print("Enter password: ");
+                    String up = sc.nextLine();
+                    users.add(new User(userId++, un, ue, up));
+                    System.out.println("User registered.");
+                    break;
+
+                case 3: // Register Worker
+                    System.out.print("Enter name: ");
+                    String wn = sc.nextLine();
+                    System.out.print("Enter email: ");
+                    String we = sc.nextLine();
+                    System.out.print("Enter password: ");
+                    String wp = sc.nextLine();
+                    workers.add(new Worker(workerId++, wn, we, wp));
+                    System.out.println("Worker registered.");
+                    break;
+
+                case 4: // User create request
+                    if (users.isEmpty()) {
+                        System.out.println("No users registered.");
+                        break;
+                    }
+                    System.out.println("Select User:");
+                    for (User u : users) System.out.println(u);
+                    int uid = sc.nextInt(); sc.nextLine();
+
+                    User selectedUser = null;
+                    for (User u : users) {
+                        if (u.getId() == uid) {
+                            selectedUser = u;
+                            break;
+                        }
+                    }
+
+                    if (selectedUser == null) {
+                        System.out.println("Invalid user.");
+                        break;
+                    }
+
+                    System.out.print("Enter request description: ");
+                    String desc = sc.nextLine();
+                    Request r = selectedUser.createRequest(requestId++, desc);
+                    requests.add(r);
+                    System.out.println("Request created.");
+                    break;
+
+                case 5: // Admin assigns worker
+                    if (admins.isEmpty() || requests.isEmpty() || workers.isEmpty()) {
+                        System.out.println("Need at least 1 admin, worker, and request.");
+                        break;
+                    }
+
+                    System.out.println("Select Admin:");
+                    for (Admin a : admins) System.out.println(a);
+                    int aid = sc.nextInt(); sc.nextLine();
+                    Admin selectedAdmin = null;
+                    for (Admin a : admins) {
+                        if (a.getId() == aid) {
+                            selectedAdmin = a;
+                            break;
+                        }
+                    }
+                    if (selectedAdmin == null) {
+                        System.out.println("Invalid admin.");
+                        break;
+                    }
+
+                    System.out.println("Select Request:");
+                    for (Request rq : requests) System.out.println(rq);
+                    int rid = sc.nextInt(); sc.nextLine();
+                    Request selectedReq = null;
+                    for (Request req : requests) {
+                        if (req.getId() == rid) {
+                            selectedReq = req;
+                            break;
+                        }
+                    }
+                    if (selectedReq == null) {
+                        System.out.println("Invalid request.");
+                        break;
+                    }
+
+                    System.out.println("Select Worker:");
+                    for (Worker w : workers) System.out.println(w);
+                    int wid = sc.nextInt(); sc.nextLine();
+                    Worker selectedWorker = null;
+                    for (Worker w : workers) {
+                        if (w.getId() == wid) {
+                            selectedWorker = w;
+                            break;
+                        }
+                    }
+                    if (selectedWorker == null) {
+                        System.out.println("Invalid worker.");
+                        break;
+                    }
+
+                    selectedAdmin.assignWorker(selectedReq, selectedWorker);
+                    break;
+
+                case 6: // Worker updates request
+                    if (workers.isEmpty() || requests.isEmpty()) {
+                        System.out.println("No workers or requests.");
+                        break;
+                    }
+                    System.out.println("Select Worker:");
+                    for (Worker w : workers) System.out.println(w);
+                    int wid2 = sc.nextInt(); sc.nextLine();
+
+                    Worker selectedWorker2 = null;
+                    for (Worker w : workers) {
+                        if (w.getId() == wid2) {
+                            selectedWorker2 = w;
+                            break;
+                        }
+                    }
+                    if (selectedWorker2 == null) {
+                        System.out.println("Invalid worker.");
+                        break;
+                    }
+
+                    System.out.println("Select Request to update:");
+                    for (Request rq : requests) {
+                        if (rq.getAssignedWorker() != null &&
+                            rq.getAssignedWorker().getId() == selectedWorker2.getId()) {
+                            System.out.println(rq);
+                        }
+                    }
+                    int rid2 = sc.nextInt(); sc.nextLine();
+
+                    Request selectedReq2 = null;
+                    for (Request req : requests) {
+                        if (req.getId() == rid2) {
+                            selectedReq2 = req;
+                            break;
+                        }
+                    }
+                    if (selectedReq2 == null) {
+                        System.out.println("Invalid request.");
+                        break;
+                    }
+
+                    System.out.print("Enter new status: ");
+                    String newStatus = sc.nextLine();
+                    selectedWorker2.updateRequestStatus(selectedReq2, newStatus);
+                    break;
+
+                case 7: // Admin filters requests
+                    if (admins.isEmpty() || requests.isEmpty()) {
+                        System.out.println("No admins or requests.");
+                        break;
+                    }
+                    System.out.println("Select Admin:");
+                    for (Admin a : admins) System.out.println(a);
+                    int aid2 = sc.nextInt(); sc.nextLine();
+
+                    Admin selectedAdmin2 = null;
+                    for (Admin a : admins) {
+                        if (a.getId() == aid2) {
+                            selectedAdmin2 = a;
+                            break;
+                        }
+                    }
+                    if (selectedAdmin2 == null) {
+                        System.out.println("Invalid admin.");
+                        break;
+                    }
+
+                    System.out.print("Enter status to filter: ");
+                    String fs = sc.nextLine();
+                    selectedAdmin2.filterRequestByStatus(requests, fs);
+                    break;
+
+                case 8: // Show all requests
+                    if (requests.isEmpty()) {
+                        System.out.println("No requests.");
+                    } else {
+                        for (Request rq : requests) System.out.println(rq);
+                    }
+                    break;
+
+                case 0: // Exit
+                    System.out.println("Exiting...");
+                    sc.close();
+                    return;
+
+                default:
+                    System.out.println("Invalid choice.");
+            }
+        }
+    }
+}
